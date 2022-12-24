@@ -1,0 +1,39 @@
+---
+- hosts: webservers
+  tasks:
+  - name: Install httpd on RedHat or CentOS
+    yum:
+       name: "{{ item }}"
+       state: latest
+    with_items:
+       - httpd
+       - wget
+       - unzip
+    when: ansible_os_family == 'CentOS' or ansible_os_family == 'RedHat'
+    
+  - name: Install Apache on Ubuntu or Debian
+    apt:
+       name: "{{ item }}"
+       state: latest
+    with_items:
+       - apache2
+    when: ansible_os_family == 'Ubuntu' or ansible_os_family == 'Debian'
+      
+  - name: Creates directoy
+    file: path=/var/www/html/ansible state=directory
+  
+  - name: Ensure Apache is running on RedHat or CentOS
+    service: name=httpd enabled=yes state=started
+    when: ansible_os_family == 'CentOS' or ansible_os_family == 'RedHat'
+    
+  - name: Ensure Apache is running on Ubuntu or Debian
+    service: name=apache2 enabled=yes state=started
+    when: ansible_os_family == 'Ubuntu' or ansible_os_family == 'Debian'
+    
+  - name: Copy the website config file
+    copy: src=/opt/ansible/index.html dest=/var/www/html/index.html mode=0755
+    notify:
+      - Restart apache
+  handlers:
+      - name: Restart apache
+        service: name=httpd state=restarted
