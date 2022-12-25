@@ -1,5 +1,4 @@
-[all:vars]
-ansible_ssh_common_args='-o StrictHostKeyChecking=no'
-
+[local]
+localhost ansible_connection=local
 [webservers]
-ansnode01 ansible_ssh_host=172.31.30.255 ansible_ssh_port=22 ansible_user=ansadmin
+ansnode01 ansible_host=172.31.30.255 ansible_user=ansadmin ansible_become=true
